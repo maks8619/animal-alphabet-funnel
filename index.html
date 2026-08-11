@@ -1665,8 +1665,10 @@
       }, { passive: true });
     }
 
-    // ===== HAPTIC FEEDBACK HELPER =====
+    // ===== HAPTIC FEEDBACK HELPER (Android + iOS Safari Support) =====
+    var iosHapticSwitch = null;
     function triggerHaptic(type) {
+      // Android / Pixel support via standard Vibration API
       if ('vibrate' in navigator) {
         try {
           if (type === 'light') navigator.vibrate(12);
@@ -1675,6 +1677,20 @@
           else navigator.vibrate(15);
         } catch (e) {}
       }
+
+      // iOS / iPhone support via WebKit switch input trick
+      try {
+        if (!iosHapticSwitch && document.body) {
+          iosHapticSwitch = document.createElement('input');
+          iosHapticSwitch.type = 'checkbox';
+          iosHapticSwitch.setAttribute('switch', '');
+          iosHapticSwitch.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;';
+          document.body.appendChild(iosHapticSwitch);
+        }
+        if (iosHapticSwitch) {
+          iosHapticSwitch.checked = !iosHapticSwitch.checked;
+        }
+      } catch (e) {}
     }
 
     // ===== SCROLL HINT REMOVAL =====
